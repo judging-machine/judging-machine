@@ -1,2 +1,2 @@
-# Package name
-Package Name
+# Judging Machine
+Judging Machine.
