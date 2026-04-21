@@ -11,28 +11,24 @@ import json
 from os import environ
 
 
-def respond(messages, instructions, **kwargs):
+def respond(messages=None, instructions=None, **kwargs):
     """
+    Sends a request to the Groq Responses API using only Python's built-in urllib.
     """
-    api_key = environ.get("DEPSEK_API_KEY")
-    api_base = environ.get("DEPSEK_API_BASE", "https://api.deepseek.com")
-    default_model = environ.get("DEPSEK_DEFAULT_MODEL", "deepseek-reasoner")
+    api_base = environ.get('GROQ_API_BASE', 'https://api.groq.com/openai/v1')
+    api_key = environ.get('GROQ_API_KEY', '')
+    default_model = environ.get('GROQ_DEFAULT_MODEL', 'openai/gpt-oss-120b')
 
     instruction = kwargs.get('system_instruction', instructions)
-    first_message = [dict(role='system', content=instruction)] if instruction else []
-
-    # add contents and user text to the first (instruction) message
-    first_message.extend(messages)
-    instruction_and_contents = first_message
 
     # Define the payload
     payload = {
-        "model":            kwargs.get("model", default_model),
-        "messages":         instruction_and_contents,
-        "max_tokens":       kwargs.get("max_tokens", 32000),
-        "temperature":      kwargs.get("temperature", 1.0),
-        "thinking": {
-            "type": "enabled"
+        "model": kwargs.get("model", default_model),
+        "instructions": instruction,
+        "input": messages,
+        "max_output_tokens": kwargs.get("max_tokens", 65536),
+        "reasoning": {
+            "effort": "high"
         }
     }
 
@@ -43,12 +39,12 @@ def respond(messages, instructions, **kwargs):
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {api_key}",
-        "User-Agent": "Name-of-the-Machine"
+        "User-Agent": "Judging-Machine"
     }
 
     # Create the Request object
     req = urllib.request.Request(
-        f'{api_base}/chat/completions',
+        f'{api_base}/responses',
         data=data_bytes,
         headers=headers,
         method="POST")
@@ -58,10 +54,15 @@ def respond(messages, instructions, **kwargs):
         with urllib.request.urlopen(req, timeout=300) as response:
             response_data = response.read().decode('utf-8')
             output = json.loads(response_data)
-            message = output['choices'][0]['message']
-            text = message['content']
-            thoughts = message['reasoning_content']
-
+            text = ''
+            thoughts = ''
+            for part in output['output']:
+                if part['type'] == 'message':
+                    for chunk in part['content']:
+                        text += chunk['text']
+                elif part['type'] == 'reasoning':
+                    for chunk in part['content']:
+                        thoughts += chunk['text']
         return thoughts, text
 
     except urllib.error.HTTPError as e:
@@ -77,5 +78,5 @@ def respond(messages, instructions, **kwargs):
         return '', ''
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     ...

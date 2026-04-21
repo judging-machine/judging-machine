@@ -17,8 +17,8 @@ from .utilities import new_plato_text
 def options_and_arguments():
     # Initialize the parser
     parser = argparse.ArgumentParser(
-        description="Name-of-the-Machine thinks for you about the meanings.",
-        epilog="Example:  name-of-the-machine input_text.txt > output_text.txt"
+        description="Judging-Machine thinks for you about the meanings.",
+        epilog="Example:  judging-machine input_text.txt > output_text.txt"
         # thinking-machine multilogue.txt > tmp && mv tmp multilogue.txt
     )
 
@@ -49,10 +49,10 @@ def options_and_arguments():
 
 def run():
     """
-    $ text | name-of-the-machine                        # Accepts text from the pipe
-    $ echo "...<text>..." | name-of-the-machine         #
+    $ text | judging-machine                        # Accepts text from the pipe
+    $ echo "...<text>..." | judging-machine         #
 
-    $ name-of-the-machine multilogue.txt new_turn.txt    # ...or files.
+    $ judging-machine multilogue.txt new_turn.txt    # ...or files.
     """
 
     args = options_and_arguments().parse_args()
