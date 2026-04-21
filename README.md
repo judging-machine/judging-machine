@@ -1,5 +1,5 @@
 # Judging-Machine
-A Machine that thinks.
+A machine that passes judgments.
 
 In order to launch it from the command line or as a Python subprocess:
 ```bash
